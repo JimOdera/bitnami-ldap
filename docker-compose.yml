@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  openldap:
+    image: bitnami/openldap:latest
+    environment:
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=adminpassword
+      - LDAP_USERS=customuser
+      - LDAP_PASSWORDS=custompassword
+      - LDAP_CUSTOM_LDIF_DIR=/ldifs
+      - LDAP_ROOT=dc=example,dc=com
+    ports:
+      - "1389:1389"
+      - "1636:1636"
+    volumes:
+      - ./ldifs:/ldifs
+      - openldap_data:/bitnami/openldap
+    healthcheck:
+      test: [ "CMD", "ldapsearch", "-x", "-H", "ldap://localhost:1389", "-b", "ou=users,dc=example,dc=com" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  openldap_data:
